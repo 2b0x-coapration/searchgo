@@ -1,0 +1,17 @@
+name: Build SUPERGO.exe
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -r requirements.txt
+      - run: >
+          pyinstaller --noconfirm --clean --onefile --windowed --name SUPERGO --icon supergo.ico
+          --collect-all webview --collect-all pythonnet --collect-all clr_loader
+          --add-data "supergo.png;." --add-data "supergo.ico;." --add-data "blocked_hosts.txt;." --add-data "blocklist.meta.json;." --add-data "servers.tsv.gz;."
+          supergo_win.py
+      - uses: actions/upload-artifact@v4
+        with: { name: SUPERGO-exe, path: dist/SUPERGO.exe }
